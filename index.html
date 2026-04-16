@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DFA to Regular Expression</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: Arial, sans-serif;
+  background: #f0f2f5;
+  padding: 20px;
+  color: #222;
+}
+
+h1 { font-size: 22px; color: #1a1a2e; margin-bottom: 4px; }
+p.sub { font-size: 13px; color: #777; margin-bottom: 20px; }
+
+.row {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+#left  { width: 320px; flex-shrink: 0; }
+#right { flex: 1; min-width: 300px; }
+
+h2 {
+  font-size: 14px;
+  color: #1a1a2e;
+  border-bottom: 2px solid #4a90e2;
+  padding-bottom: 5px;
+  margin-bottom: 14px;
+}
+
+label {
+  display: block;
+  font-size: 12px;
+  color: #555;
+  margin-top: 10px;
+  margin-bottom: 3px;
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #bbb;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+input[type="text"]:focus { border-color: #4a90e2; outline: none; }
+
+.btn-blue {
+  display: block;
+  width: 100%;
+  margin-top: 14px;
+  padding: 10px;
+  background: #4a90e2;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+}
+.btn-blue:hover { background: #357abd; }
+
+.divider { border-top: 1px dashed #ddd; margin: 18px 0; }
+
+.btn-ex {
+  display: block;
+  width: 100%;
+  text-align: left;
+  margin-bottom: 8px;
+  padding: 8px 12px;
+  background: #fff;
+  border: 1px solid #bbb;
+  border-radius: 5px;
+  font-size: 13px;
+  cursor: pointer;
+  color: #333;
+}
+.btn-ex:hover { background: #eef5ff; border-color: #4a90e2; color: #4a90e2; }
+
+table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 12px; }
+th { background: #eef3fb; padding: 7px; border: 1px solid #ccc; text-align: center; }
+td { border: 1px solid #ccc; padding: 6px 4px; text-align: center; }
+td.sname { font-weight: bold; color: #4a90e2; background: #f8fbff; }
+td input { width: 58px; padding: 4px; border: 1px solid #bbb; border-radius: 4px; font-size: 13px; text-align: center; }
+
+canvas {
+  display: block;
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: #fafafa;
+}
+
+#regex-box {
+  font-family: 'Courier New', monospace;
+  font-size: 24px;
+  font-weight: bold;
+  color: #1a1a2e;
+  background: #eef3fb;
+  border: 1px solid #4a90e2;
+  border-radius: 6px;
+  padding: 14px 18px;
+  word-break: break-all;
+  margin: 14px 0;
+}
+
+.step {
+  border: 1px solid #ddd;
+  border-left: 4px solid #4a90e2;
+  border-radius: 0 6px 6px 0;
+  padding: 10px 14px;
+  background: #fafafa;
+  font-size: 13px;
+  line-height: 1.8;
+  margin-bottom: 8px;
+}
+.step-title { font-weight: bold; font-size: 11px; text-transform: uppercase; color: #4a90e2; margin-bottom: 3px; letter-spacing: 0.5px; }
+.hi { color: #d35400; font-weight: bold; font-family: monospace; }
+.st { color: #4a90e2; font-weight: bold; font-family: monospace; }
+
+.hint { font-size: 12px; color: #888; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+
+<h1>DFA to Regular Expression Converter</h1>
+<p class="sub">Theory of Automata &amp; Formal Languages — CA Project | State Elimination Method</p>
+
+<div class="row">
+
+  <!-- LEFT PANEL -->
+  <div class="card" id="left">
+
+    <h2>Step 1: DFA Details</h2>
+
+    <label>States (comma separated)</label>
+    <input type="text" id="inp-states" value="q0,q1">
+
+    <label>Alphabet (comma separated)</label>
+    <input type="text" id="inp-alpha" value="a,b">
+
+    <label>Start State</label>
+    <input type="text" id="inp-start" value="q0">
+
+    <label>Accept States (comma separated)</label>
+    <input type="text" id="inp-accepts" value="q1">
+
+    <button class="btn-blue" onclick="onBuildTable()">Build Transition Table</button>
+
+    <div id="table-section" style="display:none;">
+      <div class="divider"></div>
+      <h2>Step 2: Transition Table</h2>
+      <p class="hint">Type the next state in each cell.</p>
+      <div id="table-container"></div>
+      <button class="btn-blue" onclick="onCompute()">Compute Regular Expression</button>
+    </div>
+
+    <div class="divider"></div>
+    <h2>Quick Examples</h2>
+    <button class="btn-ex" onclick="loadPreset(0)">Strings ending in 'a'</button>
+    <button class="btn-ex" onclick="loadPreset(1)">Even number of a's</button>
+    <button class="btn-ex" onclick="loadPreset(2)">Starts with 'ab'</button>
+
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="card" id="right">
+
+    <h2>DFA Diagram</h2>
+    <canvas id="mycanvas" height="260"></canvas>
+
+    <div id="result-section" style="display:none;">
+      <div class="divider"></div>
+      <h2>Regular Expression Result</h2>
+      <div id="regex-box"></div>
+
+      <h2>Elimination Steps</h2>
+      <div id="steps-container"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// =========================================================
+//  REGEX ALGEBRA
+// =========================================================
+var PHI = '\u2205'; // ∅
+var EPS = '\u03b5'; // ε
+
+function reWrap(r) {
+  if (!r || r === PHI || r === EPS) return r;
+  var d = 0;
+  for (var i = 0; i < r.length; i++) {
+    if (r[i] === '(') d++;
+    else if (r[i] === ')') d--;
+    else if (r[i] === '|' && d === 0) return '(' + r + ')';
+  }
+  return r;
+}
+
+function reStar(r) {
+  if (!r || r === PHI || r === EPS) return EPS;
+  if (r.length === 1) return r + '*';
+  if (r[r.length-1] === '*') return r;
+  if (r[0] === '(' && closeIdx(r,0) === r.length-1) return r + '*';
+  return '(' + r + ')*';
+}
+
+function reConcat(a, b) {
+  if (a === PHI || b === PHI) return PHI;
+  if (a === EPS) return b;
+  if (b === EPS) return a;
+  return reWrap(a) + reWrap(b);
+}
+
+function reUnion(a, b) {
+  if (a === PHI) return b;
+  if (b === PHI) return a;
+  if (a === b)   return a;
+  return a + '|' + b;
+}
+
+function closeIdx(s, o) {
+  var d = 0;
+  for (var i = o; i < s.length; i++) {
+    if (s[i]==='(') d++;
+    else if (s[i]===')') { d--; if(d===0) return i; }
+  }
+  return -1;
+}
+
+// =========================================================
+//  STATE ELIMINATION
+// =========================================================
+function dfaToRegex(states, alpha, start, accepts, trans) {
+  var steps = [];
+  var QS = '__qs__', QF = '__qf__';
+
+  // init gnfa — all labels = PHI
+  var gnfa = {};
+  var all = [QS].concat(states).concat([QF]);
+  for (var i = 0; i < all.length; i++) {
+    gnfa[all[i]] = {};
+    for (var j = 0; j < all.length; j++) gnfa[all[i]][all[j]] = PHI;
+  }
+
+  // super-start -> old start
+  gnfa[QS][start] = EPS;
+
+  // old accepts -> super-final
+  for (var a = 0; a < accepts.length; a++) {
+    gnfa[accepts[a]][QF] = reUnion(gnfa[accepts[a]][QF], EPS);
+  }
+
+  // load dfa transitions
+  for (var s = 0; s < states.length; s++) {
+    for (var sy = 0; sy < alpha.length; sy++) {
+      var from = states[s], sym = alpha[sy];
+      var to = trans[from] && trans[from][sym];
+      if (to) gnfa[from][to] = reUnion(gnfa[from][to], sym);
+    }
+  }
+
+  steps.push({
+    title: 'Build GNFA',
+    desc: 'Added <span class="st">q_s</span> \u2192 <span class="st">' + start + '</span> (\u03b5) '
+        + 'and <span class="st">q_f</span> \u2190 {<span class="hi">' + accepts.join(', ') + '</span>} (\u03b5). '
+        + 'DFA transitions loaded as labels.'
+  });
+
+  // eliminate each original state (static list, no splicing!)
+  var toElim = states.slice();
+
+  for (var ki = 0; ki < toElim.length; ki++) {
+    var qk = toElim[ki];
+    if (!gnfa[qk]) continue;
+
+    var loop = gnfa[qk][qk];
+    var ls   = reStar(loop);
+    var desc = 'Eliminating <span class="st">' + qk + '</span>.';
+    if (loop !== PHI) desc += ' Self-loop <span class="hi">' + loop + '</span> \u2192 <span class="hi">' + ls + '</span>.';
+
+    var updates = [];
+    var keys = Object.keys(gnfa);
+
+    for (var pi = 0; pi < keys.length; pi++) {
+      var qi = keys[pi];
+      if (qi === qk || !gnfa[qi]) continue;
+      for (var pj = 0; pj < keys.length; pj++) {
+        var qj = keys[pj];
+        if (qj === qk || !gnfa[qj]) continue;
+
+        var rij = gnfa[qi][qj] !== undefined ? gnfa[qi][qj] : PHI;
+        var rik = gnfa[qi][qk] !== undefined ? gnfa[qi][qk] : PHI;
+        var rkj = gnfa[qk][qj] !== undefined ? gnfa[qk][qj] : PHI;
+
+        if (rik === PHI || rkj === PHI) continue;
+
+        var path = reConcat(reConcat(rik, ls), rkj);
+        var nl   = reUnion(rij, path);
+        if (nl !== rij) {
+          updates.push('<span class="st">' + qi + '</span>\u2192<span class="st">' + qj + '</span>: <span class="hi">' + nl + '</span>');
+        }
+        gnfa[qi][qj] = nl;
+      }
+    }
+
+    // delete qk from gnfa
+    delete gnfa[qk];
+    var rem = Object.keys(gnfa);
+    for (var r = 0; r < rem.length; r++) {
+      if (gnfa[rem[r]]) delete gnfa[rem[r]][qk];
+    }
+
+    if (updates.length) desc += '<br>Updated: ' + updates.join(' &nbsp; ');
+    else desc += ' No paths through this state.';
+    steps.push({ title: 'Eliminate ' + qk, desc: desc });
+  }
+
+  var result = (gnfa[QS] && gnfa[QS][QF]) ? gnfa[QS][QF] : PHI;
+  steps.push({
+    title: 'Done',
+    desc: 'Final regex: <span class="hi">' + result + '</span>'
+  });
+
+  return { regex: result, steps: steps };
+}
+
+// =========================================================
+//  CANVAS DRAWING
+// =========================================================
+function drawDFA(states, alpha, start, accepts, trans) {
+  var cv  = document.getElementById('mycanvas');
+  var W   = cv.parentElement.clientWidth - 42;
+  var H   = 260;
+  cv.width  = W;
+  cv.height = H;
+  var ctx = cv.getContext('2d');
+
+  ctx.fillStyle = '#fafafa';
+  ctx.fillRect(0, 0, W, H);
+
+  if (!states || !states.length) {
+    ctx.fillStyle = '#aaa';
+    ctx.font = '14px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('Diagram appears here after building', W/2, H/2);
+    return;
+  }
+
+  var SR = 26;
+  var cx = W/2, cy = H/2;
+  var lr = Math.min(W, H) * 0.30;
+  var pos = {};
+
+  for (var i = 0; i < states.length; i++) {
+    var ang = (2*Math.PI*i/states.length) - Math.PI/2;
+    pos[states[i]] = { x: cx + lr*Math.cos(ang), y: cy + lr*Math.sin(ang) };
+  }
+
+  // group edges
+  var edges = {};
+  for (var s = 0; s < states.length; s++) {
+    for (var sy = 0; sy < alpha.length; sy++) {
+      var f = states[s], sym = alpha[sy];
+      var t = trans[f] && trans[f][sym];
+      if (!t) continue;
+      var k = f + '||' + t;
+      if (!edges[k]) edges[k] = { f:f, t:t, syms:[] };
+      edges[k].syms.push(sym);
+    }
+  }
+
+  var ekeys = Object.keys(edges);
+  for (var ei = 0; ei < ekeys.length; ei++) {
+    var e = edges[ekeys[ei]];
+    var lbl = e.syms.join(',');
+    var pf = pos[e.f], pt = pos[e.t];
+
+    ctx.strokeStyle = '#888';
+    ctx.fillStyle   = '#888';
+    ctx.lineWidth   = 1.5;
+
+    if (e.f === e.t) {
+      // self loop
+      var lx = pf.x, ly = pf.y - SR;
+      ctx.beginPath();
+      ctx.arc(lx, ly-16, 16, Math.PI*0.25, Math.PI*2.75);
+      ctx.stroke();
+      mkArrow(ctx, lx-3, ly-2, lx+4, ly-1, '#888');
+      ctx.fillStyle = '#333';
+      ctx.font = '12px Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(lbl, lx, ly-38);
+    } else {
+      var dx = pt.x-pf.x, dy = pt.y-pf.y;
+      var dist = Math.sqrt(dx*dx+dy*dy);
+      var ux = dx/dist, uy = dy/dist;
+      var sx = pf.x+ux*SR, sy2 = pf.y+uy*SR;
+      var ex = pt.x-ux*SR, ey  = pt.y-uy*SR;
+      var bidi = !!edges[e.t+'||'+e.f];
+      var bend = bidi ? 28 : 0;
+      var nx = -uy*bend, ny = ux*bend;
+
+      ctx.beginPath();
+      if (bend > 0) {
+        var cpx=(sx+ex)/2+nx, cpy=(sy2+ey)/2+ny;
+        ctx.moveTo(sx,sy2); ctx.quadraticCurveTo(cpx,cpy,ex,ey); ctx.stroke();
+        var tt=0.85;
+        var ax=(1-tt)*(1-tt)*sx+2*(1-tt)*tt*cpx+tt*tt*ex;
+        var ay=(1-tt)*(1-tt)*sy2+2*(1-tt)*tt*cpy+tt*tt*ey;
+        mkArrow(ctx,ax,ay,ex,ey,'#888');
+        ctx.fillStyle='#333'; ctx.font='12px Arial'; ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.fillText(lbl,(sx+ex)/2+nx*0.6,(sy2+ey)/2+ny*0.6-8);
+      } else {
+        ctx.moveTo(sx,sy2); ctx.lineTo(ex,ey); ctx.stroke();
+        mkArrow(ctx,sx,sy2,ex,ey,'#888');
+        ctx.fillStyle='#333'; ctx.font='12px Arial'; ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.fillText(lbl,(sx+ex)/2-uy*14,(sy2+ey)/2+ux*14);
+      }
+    }
+  }
+
+  // start arrow
+  if (pos[start]) {
+    var sp = pos[start];
+    ctx.strokeStyle='#27ae60'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(sp.x-SR-30,sp.y); ctx.lineTo(sp.x-SR-2,sp.y); ctx.stroke();
+    mkArrow(ctx,sp.x-SR-18,sp.y,sp.x-SR-2,sp.y,'#27ae60');
+  }
+
+  // state circles
+  for (var si = 0; si < states.length; si++) {
+    var st = states[si], p = pos[st];
+    var isAcc = accepts.indexOf(st) >= 0;
+    var isSt  = st === start;
+
+    if (isAcc) {
+      ctx.beginPath(); ctx.arc(p.x,p.y,SR+5,0,2*Math.PI);
+      ctx.strokeStyle='#4a90e2'; ctx.lineWidth=1.5; ctx.stroke();
+    }
+    ctx.beginPath(); ctx.arc(p.x,p.y,SR,0,2*Math.PI);
+    ctx.fillStyle = isSt ? '#eafaf1' : (isAcc ? '#eef3fb' : '#fff');
+    ctx.fill();
+    ctx.strokeStyle = isAcc ? '#4a90e2' : (isSt ? '#27ae60' : '#888');
+    ctx.lineWidth = (isAcc||isSt) ? 2 : 1.5;
+    ctx.stroke();
+
+    ctx.fillStyle = isAcc ? '#4a90e2' : (isSt ? '#27ae60' : '#222');
+    ctx.font = 'bold 12px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(st, p.x, p.y);
+  }
+}
+
+function mkArrow(ctx, fx, fy, tx, ty, col) {
+  var ang = Math.atan2(ty-fy, tx-fx), len = 9;
+  ctx.fillStyle = col;
+  ctx.beginPath();
+  ctx.moveTo(tx, ty);
+  ctx.lineTo(tx-len*Math.cos(ang-0.4), ty-len*Math.sin(ang-0.4));
+  ctx.lineTo(tx-len*Math.cos(ang+0.4), ty-len*Math.sin(ang+0.4));
+  ctx.closePath(); ctx.fill();
+}
+
+// =========================================================
+//  UI HELPERS
+// =========================================================
+function parseList(id) {
+  return document.getElementById(id).value.split(',')
+    .map(function(s){ return s.trim(); })
+    .filter(function(s){ return s.length > 0; });
+}
+
+function buildTableHTML(states, alpha) {
+  var h = '<table><thead><tr><th>State</th>';
+  for (var i=0;i<alpha.length;i++) h += '<th>' + alpha[i] + '</th>';
+  h += '</tr></thead><tbody>';
+  for (var s=0;s<states.length;s++) {
+    h += '<tr><td class="sname">' + states[s] + '</td>';
+    for (var a=0;a<alpha.length;a++) {
+      h += '<td><input type="text" id="T_'+states[s]+'_'+alpha[a]+'" placeholder="-"></td>';
+    }
+    h += '</tr>';
+  }
+  h += '</tbody></table>';
+  document.getElementById('table-container').innerHTML = h;
+}
+
+function readTrans(states, alpha) {
+  var t = {};
+  for (var s=0;s<states.length;s++) {
+    t[states[s]] = {};
+    for (var a=0;a<alpha.length;a++) {
+      var el = document.getElementById('T_'+states[s]+'_'+alpha[a]);
+      var v  = el ? el.value.trim() : '';
+      if (v && v !== '-') t[states[s]][alpha[a]] = v;
+    }
+  }
+  return t;
+}
+
+function showResult(regex, steps) {
+  document.getElementById('regex-box').textContent = regex;
+  var h = '';
+  for (var i=0;i<steps.length;i++) {
+    h += '<div class="step"><div class="step-title">Step '+(i+1)+': '+steps[i].title+'</div>'
+       + steps[i].desc + '</div>';
+  }
+  document.getElementById('steps-container').innerHTML = h;
+  document.getElementById('result-section').style.display = 'block';
+}
+
+// =========================================================
+//  BUTTON HANDLERS (inline onclick — most reliable)
+// =========================================================
+function onBuildTable() {
+  var states = parseList('inp-states');
+  var alpha  = parseList('inp-alpha');
+  if (!states.length || !alpha.length) {
+    alert('Please enter at least one state and one symbol.');
+    return;
+  }
+  buildTableHTML(states, alpha);
+  document.getElementById('table-section').style.display = 'block';
+  var start   = document.getElementById('inp-start').value.trim();
+  var accepts = parseList('inp-accepts');
+  drawDFA(states, alpha, start, accepts, {});
+}
+
+function onCompute() {
+  var states  = parseList('inp-states');
+  var alpha   = parseList('inp-alpha');
+  var start   = document.getElementById('inp-start').value.trim();
+  var accepts = parseList('inp-accepts');
+
+  if (!states.length || !alpha.length) { alert('States and alphabet cannot be empty.'); return; }
+  if (states.indexOf(start) < 0) { alert('Start state "' + start + '" not found in states list.'); return; }
+
+  var trans = readTrans(states, alpha);
+  drawDFA(states, alpha, start, accepts, trans);
+  var out = dfaToRegex(states, alpha, start, accepts, trans);
+  showResult(out.regex, out.steps);
+}
+
+// =========================================================
+//  PRESETS
+// =========================================================
+var PRESETS = [
+  { states:['q0','q1'], alpha:['a','b'], start:'q0', accepts:['q1'],
+    trans:{ q0:{a:'q1',b:'q0'}, q1:{a:'q1',b:'q0'} } },
+
+  { states:['q0','q1'], alpha:['a','b'], start:'q0', accepts:['q0'],
+    trans:{ q0:{a:'q1',b:'q0'}, q1:{a:'q0',b:'q1'} } },
+
+  { states:['q0','q1','q2','q3'], alpha:['a','b'], start:'q0', accepts:['q2'],
+    trans:{ q0:{a:'q1',b:'q3'}, q1:{a:'q3',b:'q2'}, q2:{a:'q2',b:'q2'}, q3:{a:'q3',b:'q3'} } }
+];
+
+function loadPreset(i) {
+  var p = PRESETS[i];
+  document.getElementById('inp-states').value  = p.states.join(',');
+  document.getElementById('inp-alpha').value   = p.alpha.join(',');
+  document.getElementById('inp-start').value   = p.start;
+  document.getElementById('inp-accepts').value = p.accepts.join(',');
+
+  buildTableHTML(p.states, p.alpha);
+  document.getElementById('table-section').style.display = 'block';
+
+  for (var s=0;s<p.states.length;s++) {
+    for (var a=0;a<p.alpha.length;a++) {
+      var el = document.getElementById('T_'+p.states[s]+'_'+p.alpha[a]);
+      if (el && p.trans[p.states[s]] && p.trans[p.states[s]][p.alpha[a]])
+        el.value = p.trans[p.states[s]][p.alpha[a]];
+    }
+  }
+
+  drawDFA(p.states, p.alpha, p.start, p.accepts, p.trans);
+  var out = dfaToRegex(p.states, p.alpha, p.start, p.accepts, p.trans);
+  showResult(out.regex, out.steps);
+}
+
+// =========================================================
+//  INIT
+// =========================================================
+window.onload = function() {
+  drawDFA([], [], '', [], {});
+};
+</script>
+
+</body>
+</html>

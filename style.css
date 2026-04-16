@@ -1,0 +1,224 @@
+/* General reset */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: Arial, sans-serif;
+  background: #f0f2f5;
+  color: #222;
+  padding: 20px;
+}
+
+h1 {
+  font-size: 24px;
+  margin-bottom: 4px;
+  color: #1a1a2e;
+}
+
+.subtitle {
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 20px;
+}
+
+/* Two column layout */
+.container {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+/* White card boxes */
+.box {
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+#input-box  { width: 340px; flex-shrink: 0; }
+#output-box { flex: 1; }
+
+/* Headings inside boxes */
+.box h2 {
+  font-size: 15px;
+  margin-bottom: 12px;
+  color: #1a1a2e;
+  border-bottom: 2px solid #4a90e2;
+  padding-bottom: 5px;
+}
+
+/* Form labels and inputs */
+label {
+  display: block;
+  font-size: 13px;
+  color: #444;
+  margin-top: 12px;
+  margin-bottom: 3px;
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #bbb;
+  border-radius: 5px;
+  font-size: 14px;
+  outline: none;
+}
+
+input[type="text"]:focus {
+  border-color: #4a90e2;
+}
+
+/* Main buttons */
+button#btn-table,
+button#btn-compute {
+  display: block;
+  width: 100%;
+  margin-top: 16px;
+  padding: 10px;
+  background: #4a90e2;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+button#btn-table:hover,
+button#btn-compute:hover {
+  background: #357abd;
+}
+
+/* Table area */
+#table-area {
+  margin-top: 20px;
+  border-top: 1px dashed #ccc;
+  padding-top: 16px;
+}
+
+.hint {
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 10px;
+}
+
+/* Transition table */
+#table-wrap table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+#table-wrap th {
+  background: #eef3fb;
+  padding: 7px 10px;
+  border: 1px solid #ccc;
+  text-align: center;
+  color: #333;
+}
+
+#table-wrap td {
+  border: 1px solid #ccc;
+  padding: 6px 8px;
+  text-align: center;
+}
+
+#table-wrap td.state-name {
+  font-weight: bold;
+  color: #4a90e2;
+  background: #f8fbff;
+}
+
+#table-wrap input {
+  width: 60px;
+  padding: 4px 6px;
+  border: 1px solid #bbb;
+  border-radius: 4px;
+  font-size: 13px;
+  text-align: center;
+}
+
+/* Example buttons */
+#examples-box {
+  margin-top: 20px;
+  border-top: 1px dashed #ccc;
+  padding-top: 16px;
+}
+
+.ex-btn {
+  display: block;
+  width: 100%;
+  text-align: left;
+  margin-bottom: 8px;
+  padding: 8px 12px;
+  background: #fff;
+  border: 1px solid #bbb;
+  border-radius: 5px;
+  font-size: 13px;
+  cursor: pointer;
+  color: #333;
+}
+
+.ex-btn:hover {
+  background: #f0f6ff;
+  border-color: #4a90e2;
+  color: #4a90e2;
+}
+
+/* Canvas */
+#canvas {
+  display: block;
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: #fafafa;
+}
+
+/* Regex result */
+#regex-out {
+  font-family: 'Courier New', monospace;
+  font-size: 26px;
+  font-weight: bold;
+  color: #1a1a2e;
+  background: #eef3fb;
+  border: 1px solid #4a90e2;
+  border-radius: 6px;
+  padding: 14px 18px;
+  word-break: break-all;
+  margin-bottom: 4px;
+}
+
+/* Steps */
+#steps-out {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.step-card {
+  border: 1px solid #ddd;
+  border-left: 4px solid #4a90e2;
+  border-radius: 0 6px 6px 0;
+  padding: 10px 14px;
+  background: #fafafa;
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.step-card .step-title {
+  font-weight: bold;
+  font-size: 12px;
+  text-transform: uppercase;
+  color: #4a90e2;
+  margin-bottom: 4px;
+  letter-spacing: 0.5px;
+}
+
+.step-card .hi { color: #e05c00; font-weight: bold; font-family: monospace; }
+.step-card .st { color: #4a90e2; font-weight: bold; font-family: monospace; }
+
+/* Responsive */
+@media (max-width: 700px) {
+  .container { flex-direction: column; }
+  #input-box { width: 100%; }
+}
